@@ -31,7 +31,7 @@ This function returns a dataframe with specified variables (or variables modifie
 }
 \examples{
 # ACS variables to be passed to tidycensus::get_acs()
-variables <- c("B03002_001", "B03002_003") # Total population & non-Hispanic, white alone population
+input_variables <- c("B03002_001", "B03002_003") # Total population & non-Hispanic, white alone population
 
 # Creating a modifying function for interpretable calculations
 data_function <- function(data){
@@ -44,10 +44,10 @@ data_function <- function(data){
  }
 
 # Loading data in wide form
-wide_data <- get_multi_geo_acs(variables = c("B03002_001", "B03002_003"), state = "IA", .fn = data_function)
+wide_data <- get_multi_geo_acs(variables = input_variables, state = "IA", .fn = data_function)
 head(wide_data)
 
 # Loading data in long form
-long_data <- get_multi_geo_acs(variables = c("B03002_001", "B03002_003", "B01001_001"), state = "IA", output = "tidy", .fn = data_function)
+long_data <- get_multi_geo_acs(variables = input_variables, state = "IA", output = "tidy", .fn = data_function)
 head(long_data)
 }

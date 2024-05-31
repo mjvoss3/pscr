@@ -5,7 +5,7 @@
 \alias{ia_tracts}
 \title{Iowa Census Tract Data}
 \format{
-An object of class \code{sf} (inherits from \code{data.frame}) with 896 rows and 14 columns.
+An object of class \code{sf} (inherits from \code{data.frame}) with 896 rows and 15 columns.
 }
 \source{
 U.S. Census Bureau TIGER/LINE

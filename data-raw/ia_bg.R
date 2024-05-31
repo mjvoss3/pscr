@@ -23,13 +23,10 @@ zctas <- zctas |>
 
 # County and Tract IDs ----------------------------------------------------
 
-bg <- bg
-
-ia_bg <- ia_bg |>
+bg <- bg |>
   mutate(
     county_geoid = paste0(STATEFP, COUNTYFP),
-    tract_geoid = paste0(STATEFP, COUNTYFP, TRACTCE),
-    .before = place_list
+    tract_geoid = paste0(STATEFP, COUNTYFP, TRACTCE)
   )
 
 # Places ------------------------------------------------------------------

@@ -21,6 +21,11 @@ zctas <- zctas |>
   transmute(zip_code = ZCTA5CE10, zcta_area = st_area(zctas))
 
 
+tracts <- tracts |>
+  mutate(
+    county_geoid = paste0(STATEFP, COUNTYFP)
+  )
+
 # Places ------------------------------------------------------------------
 
 place_int <- st_intersection(tracts, places)

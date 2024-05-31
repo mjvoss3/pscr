@@ -1,5 +1,17 @@
 
-
+#' Create ACS Variable Vector
+#'
+#' This function returns a character vector of ACS variables, pasting together a table name that is entered and a vector of variable numbers
+#' @param table The name of an ACS table, e.g. B03002
+#' @param var_nums The variable numbers to pull from an ACS table
+#' @export
+#' @examples
+#' # Create variables for table B02001 for variable numbers 1-8
+#' # These are the top-level variables in the ACS race table
+#' create_var_list("B02001", 1:8)
+create_var_list <- function(table, var_nums){
+  paste0(table, "_", stringr::str_pad(var_nums, width = 3, side = "left", pad = "0"))
+}
 
 #' Get ACS data for multiple Iowa geographies in one dataframe
 #'
@@ -13,7 +25,7 @@
 #' @export
 #' @examples
 #' # ACS variables to be passed to tidycensus::get_acs()
-#' variables <- c("B03002_001", "B03002_003") # Total population & non-Hispanic, white alone population
+#' input_variables <- c("B03002_001", "B03002_003") # Total population & non-Hispanic, white alone population
 #'
 #' # Creating a modifying function for interpretable calculations
 #' data_function <- function(data){
@@ -26,11 +38,11 @@
 #'  }
 #'
 #' # Loading data in wide form
-#' wide_data <- get_multi_geo_acs(variables = c("B03002_001", "B03002_003"), state = "IA", .fn = data_function)
+#' wide_data <- get_multi_geo_acs(variables = input_variables, state = "IA", .fn = data_function)
 #' head(wide_data)
 #'
 #' # Loading data in long form
-#' long_data <- get_multi_geo_acs(variables = c("B03002_001", "B03002_003", "B01001_001"), state = "IA", output = "tidy", .fn = data_function)
+#' long_data <- get_multi_geo_acs(variables = input_variables, state = "IA", output = "tidy", .fn = data_function)
 #' head(long_data)
 get_multi_geo_acs <- function(geos = c("block group", "tract", "place", "county"), variables, output = "wide", .fn = NULL, ...){
 
@@ -95,18 +107,6 @@ get_multi_geo_acs <- function(geos = c("block group", "tract", "place", "county"
 }
 
 
-# data_function <- function(data){
-#   data |>
-#     dplyr::transmute(
-#       GEOID = GEOID,
-#       white_pct = B03002_003E / B03002_001E #
-#     )
-# }
-# test_data <- get_multi_geo_acs(variables = c("B03002_001", "B03002_003"), state = "IA", .fn = data_function)
-#
-# test_long <- get_multi_geo_acs(variables = c("B03002_001", "B03002_003", "B01001_001"), state = "IA", output = "tidy")
-
-
 combine_multi_acs <- function(named_list){
 
   if(!is.null(named_list[["block group"]])){
@@ -152,17 +152,46 @@ combine_multi_acs <- function(named_list){
 
     return_data <- dplyr::left_join(
       named_list[["tract"]],
-      ia_tracts |> sf::st_drop_geometry() |> dplyr::select(GEOID, county_geoid, place_list, place_name, place_geoid),
+      ia_tracts |> sf::st_drop_geometry() |> dplyr::select(GEOID, county_geoid, place_list),
       by = c("tract_GEOID" = "GEOID")
     )
 
-    if(!is.null(named_list[["place"]])){
+    # if(!is.null(named_list[["place"]])){
+    #   return_data <- dplyr::left_join(
+    #     return_data,
+    #     named_list[["place"]],
+    #     by = c("place_geoid" = "place_GEOID")
+    #   )
+    # }
+
+    if(!is.null(named_list[["county"]])){
       return_data <- dplyr::left_join(
         return_data,
-        named_list[["place"]],
-        by = c("place_geoid" = "place_GEOID")
+        named_list[["county"]],
+        by = c("county_geoid" = "county_GEOID")
       )
     }
+
+    return(return_data)
+  }
+
+  if(!is.null(named_list[["zcta"]])){
+
+    data("ia_zctas")
+
+    return_data <- dplyr::left_join(
+      named_list[["tract"]],
+      ia_tracts |> sf::st_drop_geometry() |> dplyr::select(GEOID, county_geoid, place_list),
+      by = c("tract_GEOID" = "GEOID")
+    )
+
+    # if(!is.null(named_list[["place"]])){
+    #   return_data <- dplyr::left_join(
+    #     return_data,
+    #     named_list[["place"]],
+    #     by = c("place_geoid" = "place_GEOID")
+    #   )
+    # }
 
     if(!is.null(named_list[["county"]])){
       return_data <- dplyr::left_join(

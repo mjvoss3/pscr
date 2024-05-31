@@ -7,3 +7,10 @@ This package is shared on GitHub and can be installed from the Git repository. U
 ``` r
 devtools::install_github("mjvoss3/pscr")
 ```
+
+# Using the Package
+In order to see the available functions and datasets, use the code below:
+``` r
+help(package = "pscr")
+```
+

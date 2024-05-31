@@ -30,10 +30,24 @@ A dataframe with specified ACS data
 This function returns a dataframe with specified variables (or variables modified by a function) for all specified goegraphy levels
 }
 \examples{
+# ACS variables to be passed to tidycensus::get_acs()
 variables <- c("B03002_001", "B03002_003") # Total population & non-Hispanic, white alone population
-data_function <- function(data){data |> dplyr::transmute(GEOID = GEOID, pop_total = B03002_001E, white_pct = B03002_003E / B03002_001E)}
+
+# Creating a modifying function for interpretable calculations
+data_function <- function(data){
+  data |>
+    dplyr::transmute(
+      GEOID = GEOID,
+      pop_total = B03002_001E,
+      white_pct = B03002_003E / B03002_001E
+     )
+ }
+
+# Loading data in wide form
 wide_data <- get_multi_geo_acs(variables = c("B03002_001", "B03002_003"), state = "IA", .fn = data_function)
 head(wide_data)
+
+# Loading data in long form
 long_data <- get_multi_geo_acs(variables = c("B03002_001", "B03002_003", "B01001_001"), state = "IA", output = "tidy", .fn = data_function)
 head(long_data)
 }
